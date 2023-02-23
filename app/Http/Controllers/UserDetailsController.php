@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserDetailsController extends Controller
 {
@@ -11,11 +12,13 @@ class UserDetailsController extends Controller
     {
         $q = $request->input('tosearch');
         $perPage = 3;
-        $data = User::where('first_name', 'LIKE', "%{$q}%")
-            ->orwhere('last_name', 'LIKE', "%{$q}%")
-            ->orwhere('email', 'LIKE', "%{$q}%")
-            ->paginate($perPage);
 
+        if (!empty(Auth::guard('api')->user())) {
+            $data = User::where('first_name', 'LIKE', "%{$q}%")
+                ->orwhere('last_name', 'LIKE', "%{$q}%")
+                ->orwhere('email', 'LIKE', "%{$q}%")
+                ->paginate($perPage);
+        }
         $items = $data->map(function ($item) {
             return [
                 'uuid' => $item->id,
