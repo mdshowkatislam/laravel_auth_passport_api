@@ -96,6 +96,13 @@ class UserController extends Controller
 
     public function UserLogout(Request $req)
     {
-        dd($req->all());
+        $token = $req->user()->token('loginToken');
+        $token->revoke();
+
+        $response = [
+            'status' => 'success',
+            'message' => 'You have been successfully logged out!',
+        ];
+        return response($response, 200);
     }
 }
