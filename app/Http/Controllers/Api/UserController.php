@@ -16,6 +16,7 @@ class UserController extends Controller
 {
     public function UserRegister(UserSignup $req)
     {
+        $req->validated();
         $data = $req->all();
         $data['password'] = Hash::make($req['password']);
         $user = User::create($data);
@@ -35,6 +36,7 @@ class UserController extends Controller
     }
     public function UserLogin(UserSignin $req)
     {
+        $req->validated();
         // Checking email & passwor credentials
         $credentials = [
             'email' => $req->email,
