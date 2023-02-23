@@ -11,17 +11,26 @@ class UserDetailsController extends Controller
     {
         $q = $request->input('tosearch');
         $perPage = 3;
-        $data = User::where('first_name', 'LIKE', '%' . $q . '%')
-            ->orwhere('last_name', 'LIKE', '%' . $q . '%')
-            ->orwhere('email', 'LIKE', '%' . $q . '%')
+        $data = User::where('first_name', 'LIKE', "%{$q}%")
+            ->orwhere('last_name', 'LIKE', "%{$q}%")
+            ->orwhere('email', 'LIKE', "%{$q}%")
             ->paginate($perPage);
+
+        $items = $data->map(function ($item) {
+            return [
+                'uuid' => $item->id,
+                'name' => $item->first_name . '' . $item->last_name,
+            ];
+        });
+
         $metadata = [
             'current_url' => $request->fullUrl(),
             'next_url' => $data->nextPageUrl(),
             'total_pages' => $data->lastPage(),
         ];
         return [
-            'item' => $data,
+            'item' => $items,
+            'metadata' => $metadata,
         ];
     }
 }
