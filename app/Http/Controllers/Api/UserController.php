@@ -49,13 +49,14 @@ class UserController extends Controller
     }
     public function UserLogin(Request $req)
     {
-        $val_data = Validator::make($req->all, [
+        $val_data = Validator::make($req->all(), [
             'first_name' => 'required|string|max:20',
             'last_name' => 'required|string|max:20',
             'email' => 'required|string|email',
             'phone' => 'required|string|digits:8',
             'password' => 'required|string|min:8',
         ]);
+
         if ($val_data->fails()) {
             $response = [
                 'status' => 'Login Unsuccess !',
@@ -65,18 +66,34 @@ class UserController extends Controller
             return response($response, 422);
         }
         // Checking email & passwor credentials
-
-        if (
-            Auth::attempt([
-                'email' => $req->email,
-                'password' => $req->password,
-            ])
-        ) {
+        $credentials = [
+            'email' => $req->email,
+            'password' => $req->password,
+        ];
+        if (Auth::attempt($credentials)) {
             $user = Auth::User();
-            dd($user);
-            $tokengen = $user->createToken('my_token')->accessToken();
+            $tokengen = $user->createToken()->accessToken;
+            return response()->json(
+                [
+                    'status' => 'Success',
+                    'message' => 'Login success',
+                    'login' => true,
+                    'data' => $user,
+                    'token' => $tokengen,
+                ],
+                200
+            );
+        } else {
+            return response()->json(
+                [
+                    'status' => 'Unsuccess to login',
+                    'message' => 'Login failed ',
+                ],
+                401
+            );
         }
     }
+
     public function UserLogout(Request $req)
     {
         dd($req->all());
