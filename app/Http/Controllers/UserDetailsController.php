@@ -22,7 +22,7 @@ class UserDetailsController extends Controller
         $items = $data->map(function ($item) {
             return [
                 'uuid' => $item->id,
-                'name' => $item->first_name . '' . $item->last_name,
+                'name' => NameConcat($item->first_name, $item->last_name),
             ];
         });
 
